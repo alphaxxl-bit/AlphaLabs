@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AlphaLabs — Veb-sayt, QR menyu və Google Maps qeydiyyatı</title>
+<meta name="description" content="AlphaLabs rəqəmsal agentliyi: fərdi veb-sayt dizaynı, restoran və kafelər üçün QR menyu, Google Maps-da biznes qeydiyyatı. Müraciət göndərin.">
+<meta name="theme-color" content="#F2F5F9">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AlphaLabs — Müştərilər sizi tapsın">
+<meta property="og:description" content="Fərdi veb-sayt, QR menyu və Google Maps qeydiyyatı bir komandadan.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23D43524' d='M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z'/%3E%3Ccircle cx='12' cy='9' r='2.6' fill='white'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Manrope:wght@400..700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.add('js');</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "AlphaLabs",
+  "description": "Digital agency: custom website design, QR menu creation and Google Maps business listing setup.",
+  "founder": { "@type": "Person", "name": "Vusal Chelebi" },
+  "makesOffer": [
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom website design" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "QR menu creation" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Google Maps business listing setup" } }
+  ]
+}
+</script>
+
+<style>
+/* ==========================================================================
+   AlphaLabs — design tokens
+   Palette is taken from a map: paper (base), ink (text), pin red (action),
+   water blue, park green. One memorable moment: the map pin dropping in the hero.
+   ========================================================================== */
+:root {
+  --paper: #F2F5F9;
+  --white: #FFFFFF;
+  --ink: #0E1E36;
+  --muted: #56657C;
+  --line: #D9E1EC;
+
+  --pin: #D43524;
+  --pin-hover: #B92B1B;
+  --sea: #2563B8;
+  --ok: #23804A;
+
+  --map: #E4EAF3;
+  --water: #BFD8F0;
+  --park: #D5EBD8;
+  --tint-site: #DCEAF8;
+  --tint-qr: #FBE7E3;
+  --tint-map: #DCEFDF;
+
+  --f-display: "Bricolage Grotesque", "Manrope", system-ui, sans-serif;
+  --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --r-s: 10px;
+  --r-m: 18px;
+  --r-l: 28px;
+  --pill: 999px;
+
+  --wrap: 1160px;
+  --gutter: clamp(20px, 4vw, 40px);
+  --header-h: 68px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font: 400 1.0625rem/1.65 var(--f-body);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img, svg { display: block; max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+a { color: inherit; }
+
+:focus-visible { outline: 3px solid var(--sea); outline-offset: 3px; }
+.dark :focus-visible { outline-color: #9CC2FF; }
+
+.wrap { width: 100%; max-width: calc(var(--wrap) + var(--gutter) * 2); margin-inline: auto; padding-inline: var(--gutter); }
+.ic { width: 1.25em; height: 1.25em; flex: none; }
+
+.skip {
+  position: absolute; left: 12px; top: -80px; z-index: 100;
+  background: var(--ink); color: #fff; padding: 12px 18px; border-radius: var(--r-s); font-weight: 700; text-decoration: none;
+}
+.skip:focus { top: calc(12px + env(safe-area-inset-top, 0px)); }
+
+/* ---------- Type ---------- */
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; }
+h1 { font-size: clamp(2.6rem, 6.2vw, 4.9rem); line-height: 1.02; letter-spacing: -0.03em; }
+h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); line-height: 1.08; letter-spacing: -0.025em; }
+h3 { font-size: 1.4rem; line-height: 1.18; letter-spacing: -0.015em; }
+.lead { font-size: clamp(1.06rem, 1.6vw, 1.2rem); color: var(--muted); max-width: 46ch; }
+.h1-pin { display: inline-block; width: .44em; height: .59em; margin-left: .1em; color: var(--pin); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px; padding: 0 26px;
+  border: 2px solid transparent; border-radius: var(--pill);
+  font: 700 1rem/1 var(--f-body); text-decoration: none; cursor: pointer;
+  transition: background-color .15s, color .15s, border-color .15s, transform .1s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--pin); color: #fff; }
+.btn-primary:hover { background: var(--pin-hover); }
+.btn-ghost { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn-ghost:hover { background: var(--ink); color: #fff; }
+.btn-sm { min-height: 42px; padding: 0 20px; font-size: .92rem; }
+.btn-block { width: 100%; min-height: 56px; font-size: 1.05rem; }
+
+/* ---------- Header ---------- */
+.header {
+  position: sticky; top: 0; z-index: 50;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(242, 245, 249, .88);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px); backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s;
+}
+.header.scrolled { border-bottom-color: var(--line); }
+.header-in { height: var(--header-h); display: flex; align-items: center; gap: 20px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; font: 700 1.3rem/1 var(--f-display); letter-spacing: -.015em; text-decoration: none; }
+.logo-mark { width: 34px; height: 34px; border-radius: 10px; background: var(--ink); display: grid; place-items: center; }
+.logo-mark .ic { width: 18px; height: 18px; color: var(--pin); }
+.nav { margin-left: auto; display: flex; gap: 28px; }
+.nav a { color: var(--muted); font-weight: 600; font-size: .95rem; text-decoration: none; transition: color .15s; }
+.nav a:hover { color: var(--ink); }
+.lang { display: flex; padding: 3px; gap: 2px; background: var(--white); border: 1px solid var(--line); border-radius: var(--pill); }
+.lang button {
+  min-width: 40px; height: 32px; padding: 0 10px; border: 0; border-radius: var(--pill);
+  background: transparent; color: var(--muted); font-weight: 700; font-size: .82rem; cursor: pointer;
+}
+.lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.header .btn { margin-left: 0; }
+
+/* ---------- Hero ---------- */
+.hero { padding: clamp(28px, 5vw, 56px) 0 clamp(40px, 6vw, 72px); overflow-x: clip; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.hero .lead { margin-top: 22px; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.free { margin-top: 14px; font-size: .92rem; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
+.chip {
+  display: inline-flex; align-items: center; gap: 9px; padding: 10px 16px 10px 12px;
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--pill);
+  font-weight: 700; font-size: .95rem; text-decoration: none; transition: border-color .15s;
+}
+.chip:hover { border-color: var(--ink); }
+.chip .ic { color: var(--sea); }
+
+/* hero map illustration */
+.art { position: relative; width: 100%; max-width: 520px; aspect-ratio: 1 / .96; justify-self: end; }
+.map { position: absolute; inset: 0; border-radius: var(--r-l); overflow: hidden; background: var(--map); box-shadow: 0 0 0 1px var(--line), 0 34px 60px -34px rgba(14, 30, 54, .45); }
+.map svg { width: 100%; height: 100%; }
+.ground { position: absolute; left: 46%; top: 44%; width: 5%; height: 1.6%; transform: translate(-50%, -50%); background: rgba(14, 30, 54, .28); border-radius: 50%; filter: blur(1.5px); }
+.ripple { position: absolute; left: 46%; top: 44%; width: 26%; aspect-ratio: 2 / 1; transform: translate(-50%, -50%) scale(.4); border: 3px solid var(--pin); border-radius: 50%; opacity: 0; }
+.pin { position: absolute; left: 46%; top: 44%; width: 13%; transform: translate(-50%, -100%); filter: drop-shadow(0 8px 6px rgba(14, 30, 54, .25)); }
+.card-float {
+  position: absolute; background: var(--white); border-radius: 16px;
+  box-shadow: 0 20px 40px -20px rgba(14, 30, 54, .5), 0 0 0 1px rgba(14, 30, 54, .06);
+  transform: rotate(var(--rot, 0deg));
+}
+.place { left: 56%; top: 13%; padding: 12px 16px; display: grid; gap: 2px; font-size: clamp(.72rem, 1.7vw, .9rem); }
+.place strong { font-family: var(--f-display); font-size: 1.12em; line-height: 1.2; }
+.place .stars { color: #F2A516; letter-spacing: 1px; font-size: .95em; }
+.place small { color: var(--muted); font-size: .8em; font-weight: 600; }
+.tent { --rot: -4deg; left: -3%; bottom: 9%; width: 32%; padding: 10px; text-align: center; font-weight: 700; font-size: clamp(.68rem, 1.6vw, .85rem); }
+.tent .qr { width: 100%; fill: var(--ink); }
+.tent span { display: block; margin-top: 6px; }
+.minisite { right: -2%; bottom: -2%; width: 42%; padding: 10px; }
+.ms-bar { display: flex; gap: 4px; margin-bottom: 9px; }
+.ms-bar i { width: 6px; height: 6px; border-radius: 50%; background: #C5D0E0; }
+.minisite b { display: block; border-radius: 4px; }
+.ms-l1 { height: 10px; width: 72%; background: var(--ink); margin-bottom: 6px; }
+.ms-l2 { height: 6px; width: 50%; background: #B8C4D6; }
+.ms-img { height: 34px; margin-top: 10px; background: var(--tint-site); border-radius: 6px !important; }
+.ms-btn { height: 14px; width: 36%; margin-top: 10px; background: var(--pin); border-radius: 7px !important; }
+
+/* the one orchestrated moment: pin drops, ripple, cards settle */
+.js .pin { animation: drop .85s cubic-bezier(.3, 1.45, .5, 1) .3s both; }
+.js .ripple { animation: ping 1.3s ease-out 1.05s 2 both; }
+.js .card-float { animation: settle .5s ease-out both; }
+.js .place { animation-delay: 1.0s; }
+.js .tent { animation-delay: 1.15s; }
+.js .minisite { animation-delay: 1.3s; }
+@keyframes drop { from { transform: translate(-50%, -280%); opacity: 0; } 25% { opacity: 1; } to { transform: translate(-50%, -100%); opacity: 1; } }
+@keyframes ping { 0% { transform: translate(-50%, -50%) scale(.4); opacity: .75; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+@keyframes settle { from { opacity: 0; transform: translateY(10px) rotate(var(--rot, 0deg)); } to { opacity: 1; transform: translateY(0) rotate(var(--rot, 0deg)); } }
+
+/* ---------- Sections ---------- */
+.section { padding: clamp(56px, 8vw, 104px) 0; }
+.section-white { background: var(--white); }
+section[id], article[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
+.sec-head { max-width: 640px; margin-bottom: clamp(32px, 5vw, 56px); }
+.sec-lead { margin-top: 14px; color: var(--muted); max-width: 52ch; }
+
+/* services */
+.services { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.svc { display: flex; flex-direction: column; padding: 0 clamp(20px, 2.6vw, 36px); border-left: 1px solid var(--line); }
+.svc:first-child { padding-left: 0; border-left: 0; }
+.svc:last-child { padding-right: 0; }
+.tile { border-radius: var(--r-m); overflow: hidden; aspect-ratio: 36 / 22; margin-bottom: 26px; }
+.tile svg { width: 100%; height: 100%; }
+.tile-site { background: var(--tint-site); }
+.tile-qr { background: var(--tint-qr); }
+.tile-map { background: var(--tint-map); }
+.svc p { margin-top: 10px; color: var(--muted); }
+.feat { list-style: none; padding: 0; margin: 20px 0 28px; display: grid; gap: 10px; font-weight: 600; font-size: .97rem; }
+.feat li { display: flex; gap: 10px; align-items: flex-start; }
+.feat .ic { width: 20px; height: 20px; margin-top: 2px; color: var(--ok); }
+.svc .btn { margin-top: auto; align-self: flex-start; }
+
+/* process */
+.steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); }
+.step { padding-top: 22px; border-top: 2px solid var(--ink); }
+.step-n { display: block; margin-bottom: 14px; font: 700 clamp(2.4rem, 4vw, 3.4rem)/1 var(--f-display); letter-spacing: -.03em; color: var(--sea); }
+.step p { margin-top: 8px; color: var(--muted); max-width: 34ch; }
+
+/* two-column text blocks (why / faq) */
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
+.split .sec-lead { margin-top: 16px; }
+.why-item { padding: 24px 0; border-top: 1px solid var(--line); }
+.why-item:last-child { border-bottom: 1px solid var(--line); }
+.why-item h3 { font-size: 1.25rem; }
+.why-item p { margin-top: 6px; color: var(--muted); max-width: 54ch; }
+
+details { border-top: 1px solid var(--line); }
+details:last-child { border-bottom: 1px solid var(--line); }
+summary {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 20px 0; cursor: pointer; list-style: none;
+  font: 700 1.1rem/1.35 var(--f-display); letter-spacing: -.01em;
+}
+summary::-webkit-details-marker { display: none; }
+summary .ic { width: 22px; height: 22px; transition: transform .2s; color: var(--muted); }
+details[open] summary .ic { transform: rotate(180deg); }
+details p { padding: 0 40px 22px 0; color: var(--muted); max-width: 60ch; }
+
+/* ---------- Contact (dark) ---------- */
+.contact { background: var(--ink); color: #fff; padding: clamp(56px, 8vw, 104px) 0; }
+.contact-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 80px); align-items: start; }
+.contact .sec-lead { color: #B4C0D4; }
+.direct { margin-top: 36px; }
+.direct h3 { font-size: 1rem; font-family: var(--f-body); font-weight: 700; color: #B4C0D4; margin-bottom: 14px; }
+.direct-list { display: grid; gap: 10px; justify-items: start; }
+.direct a {
+  display: inline-flex; align-items: center; gap: 12px; padding: 12px 20px 12px 16px;
+  border: 1px solid rgba(255, 255, 255, .22); border-radius: var(--pill);
+  color: #fff; font-weight: 700; text-decoration: none; transition: background-color .15s, border-color .15s;
+}
+.direct a:hover { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .5); }
+.direct .val { font-weight: 500; color: #B4C0D4; }
+
+.form-card { background: var(--white); color: var(--ink); border-radius: var(--r-l); padding: clamp(22px, 3.4vw, 40px); box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .6); }
+.form-card :focus-visible { outline-color: var(--sea); }
+.form-card h3 { font-size: 1.5rem; margin-bottom: 24px; }
+.field { display: grid; gap: 8px; margin-bottom: 20px; }
+.field > label, .field > .label { font-weight: 700; font-size: .95rem; }
+.opt { font-weight: 500; color: var(--muted); }
+.input {
+  width: 100%; min-height: 54px; padding: 0 16px;
+  border: 1.5px solid #C5D0E0; border-radius: var(--r-s); background: #fff;
+  font: 500 1rem var(--f-body); color: var(--ink);
+  transition: border-color .15s, box-shadow .15s;
+}
+.input::placeholder { color: #8493AA; }
+.input:hover { border-color: #9DAEC6; }
+.input:focus { outline: none; border-color: var(--sea); box-shadow: 0 0 0 4px rgba(37, 99, 184, .18); }
+.input[aria-invalid="true"] { border-color: var(--pin); }
+.err { color: var(--pin-hover); font-size: .88rem; font-weight: 600; }
+.err:empty { display: none; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.picked {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 22px; padding: 8px 8px 8px 18px; border-radius: var(--pill);
+  background: var(--tint-site); font-size: .93rem;
+}
+.picked button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgba(14, 30, 54, .08); cursor: pointer; }
+.picked button:hover { background: rgba(14, 30, 54, .16); }
+
+.drop { position: relative; border: 2px dashed #AEBBD0; border-radius: var(--r-m); background: #F7F9FC; transition: border-color .15s, background-color .15s; }
+.drop:hover, .drop.over { border-color: var(--sea); background: #EEF4FC; }
+.drop.invalid { border-color: var(--pin); }
+.drop:focus-within { outline: 3px solid var(--sea); outline-offset: 3px; }
+.drop input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1; }
+.drop-idle, .drop-file { display: flex; align-items: center; gap: 14px; padding: 16px; }
+.drop-ic { flex: none; width: 46px; height: 46px; border-radius: 12px; background: var(--tint-site); color: var(--sea); display: grid; place-items: center; }
+.drop-ic .ic { width: 22px; height: 22px; }
+.drop-text { display: grid; gap: 2px; min-width: 0; }
+.drop-text strong { font-size: .96rem; line-height: 1.35; }
+.drop-text small { color: var(--muted); font-size: .85rem; }
+.drop-file { position: relative; z-index: 2; pointer-events: none; }
+.drop-file img { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; background: #fff; border: 1px solid var(--line); }
+.drop-file .drop-text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.drop-file .rm { pointer-events: auto; margin-left: auto; flex: none; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(14, 30, 54, .08); cursor: pointer; }
+.drop-file .rm:hover { background: rgba(14, 30, 54, .16); }
+
+.form-note { margin-top: 14px; font-size: .86rem; color: var(--muted); text-align: center; }
+.status { margin-top: 16px; padding: 14px 16px; border-radius: var(--r-s); font-weight: 600; font-size: .95rem; background: #FDECEA; color: #8F1D13; }
+
+.btn .spin { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255, 255, 255, .45); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+.btn.loading { pointer-events: none; opacity: .9; }
+.btn.loading .spin { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.success { padding: 12px 0; }
+.success:focus { outline: none; }
+.success-ic { width: 64px; height: 64px; border-radius: 50%; background: #E1F3E8; color: var(--ok); display: grid; place-items: center; margin-bottom: 22px; }
+.success-ic .ic { width: 32px; height: 32px; }
+.success h3 { font-size: 1.7rem; }
+.success p { margin: 10px 0 26px; color: var(--muted); }
+
+/* ---------- Footer ---------- */
+.footer { background: var(--ink); color: #B4C0D4; border-top: 1px solid rgba(255, 255, 255, .12); padding: 30px 0 calc(30px + env(safe-area-inset-bottom, 0px)); font-size: .92rem; }
+.foot { display: flex; flex-wrap: wrap; gap: 14px 32px; align-items: center; justify-content: space-between; }
+.footer .logo { color: #fff; font-size: 1.15rem; }
+.footer .logo-mark { background: rgba(255, 255, 255, .1); }
+
+/* ---------- Sticky mobile CTA ---------- */
+.sticky-cta {
+  position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  transform: translate(-50%, 140%); opacity: 0; pointer-events: none;
+  box-shadow: 0 16px 32px -12px rgba(14, 30, 54, .55);
+  transition: transform .25s ease, opacity .25s ease, background-color .15s;
+}
+.sticky-cta.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .nav { display: none; }
+  .header .lang { margin-left: auto; }
+  .hero-grid { grid-template-columns: 1fr; }
+  .art { justify-self: center; max-width: 440px; margin-top: 8px; }
+  .services { grid-template-columns: 1fr; }
+  .svc, .svc:first-child, .svc:last-child { padding: 0 0 44px; border-left: 0; border-bottom: 1px solid var(--line); margin-bottom: 44px; }
+  .svc:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+  .tile { max-width: 520px; }
+  .steps { grid-template-columns: 1fr; }
+  .split, .contact-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 901px) { .sticky-cta { display: none; } }
+@media (max-width: 560px) {
+  .header .btn { display: none; }
+  .cta-row .btn { flex: 1 1 100%; }
+  details p { padding-right: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .ripple { display: none; }
+}
+</style>
+</head>
+
+<body id="top">
+<a class="skip" href="#main" data-i18n="skip">Əsas məzmuna keç</a>
+
+<!-- Shared SVG defs: icons + decorative QR pattern -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="qr">
+      <path fill-rule="evenodd" d="M0 0h7v7h-7zM1 1h5v5h-5zM2 2h3v3h-3zM14 0h7v7h-7zM15 1h5v5h-5zM16 2h3v3h-3zM0 14h7v7h-7zM1 15h5v5h-5zM2 16h3v3h-3z"/>
+      <path d="M8 0h1v1h-1zM10 0h1v1h-1zM12 0h1v1h-1zM9 1h1v1h-1zM11 1h1v1h-1zM8 2h2v1h-2zM12 2h1v1h-1zM10 3h2v1h-2zM8 4h1v1h-1zM12 4h1v1h-1zM9 5h3v1h-3zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM0 8h1v1h-1zM2 8h2v1h-2zM5 8h1v1h-1zM7 8h3v1h-3zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h2v1h-2zM19 8h2v1h-2zM1 9h1v1h-1zM4 9h1v1h-1zM6 9h1v1h-1zM8 9h1v1h-1zM10 9h2v1h-2zM13 9h1v1h-1zM15 9h1v1h-1zM18 9h1v1h-1zM20 9h1v1h-1zM0 10h1v1h-1zM2 10h1v1h-1zM5 10h1v1h-1zM7 10h1v1h-1zM9 10h2v1h-2zM12 10h1v1h-1zM14 10h2v1h-2zM17 10h1v1h-1zM19 10h1v1h-1zM1 11h1v1h-1zM3 11h2v1h-2zM6 11h1v1h-1zM8 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM20 11h1v1h-1zM0 12h1v1h-1zM2 12h1v1h-1zM6 12h2v1h-2zM9 12h2v1h-2zM12 12h1v1h-1zM14 12h1v1h-1zM17 12h1v1h-1zM19 12h2v1h-2zM8 13h1v1h-1zM10 13h2v1h-2zM13 13h1v1h-1zM15 13h1v1h-1zM17 13h1v1h-1zM19 13h1v1h-1zM8 14h2v1h-2zM11 14h1v1h-1zM14 14h1v1h-1zM16 14h2v1h-2zM20 14h1v1h-1zM10 15h1v1h-1zM12 15h2v1h-2zM15 15h1v1h-1zM18 15h2v1h-2zM8 16h1v1h-1zM11 16h1v1h-1zM14 16h1v1h-1zM16 16h2v1h-2zM20 16h1v1h-1zM9 17h2v1h-2zM12 17h1v1h-1zM15 17h1v1h-1zM18 17h3v1h-3zM8 18h1v1h-1zM11 18h1v1h-1zM13 18h2v1h-2zM17 18h1v1h-1zM9 19h2v1h-2zM12 19h1v1h-1zM16 19h1v1h-1zM18 19h1v1h-1zM20 19h1v1h-1zM8 20h1v1h-1zM10 20h2v1h-2zM14 20h2v1h-2zM19 20h2v1h-2z"/>
+    </g>
+
+    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-site" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path fill="currentColor" d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 18h2v2h-2zM18 14h2v2h-2z"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V5m0 0L8 9m4-4l4 4M5 16v2.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 7.5l8.5 6 8.5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.8 8.5c.3 2.6 2.9 5.2 5.9 5.9l1.2-1.3-2-1-.9.7a4.5 4.5 0 0 1-2.4-2.4l.7-.9-1-2z" fill="currentColor"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ======================= HEADER ======================= -->
+<header class="header" id="header">
+  <div class="wrap header-in">
+    <a class="logo" href="#top" aria-label="AlphaLabs">
+      <span class="logo-mark"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></span>
+      AlphaLabs
+    </a>
+    <nav class="nav" data-i18n-aria="nav_aria" aria-label="Əsas menyu">
+      <a href="#services" data-i18n="nav_services">Xidmətlər</a>
+      <a href="#process" data-i18n="nav_process">Necə işləyirik</a>
+      <a href="#faq" data-i18n="nav_faq">Suallar</a>
+      <a href="#contact" data-i18n="nav_contact">Əlaqə</a>
+    </nav>
+    <div class="lang" role="group" data-i18n-aria="lang_aria" aria-label="Dil">
+      <button type="button" data-lang="az" aria-pressed="true">AZ</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn btn-primary btn-sm" href="#contact" data-i18n="nav_cta">Müraciət et</a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ======================= HERO ======================= -->
+<section class="hero" id="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1>
+        <span data-i18n="hero_h1">Müştərilər sizi tapsın</span><svg class="h1-pin" viewBox="0 0 48 64" aria-hidden="true"><path fill="currentColor" d="M24 0C10.7 0 0 10.4 0 23.3 0 41 24 64 24 64s24-23 24-40.7C48 10.4 37.3 0 24 0z"/><circle cx="24" cy="23" r="9" fill="#F2F5F9"/></svg>
+      </h1>
+      <p class="lead" data-i18n="hero_sub">Veb-sayt, QR menyu və Google Maps qeydiyyatı: biznesinizin onlayn görünməsi üçün üç xidmət, bir komanda.</p>
+
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#contact" data-i18n="hero_cta1">Müraciət et</a>
+        <a class="btn btn-ghost" href="#services" data-i18n="hero_cta2">Xidmətlərə bax</a>
+      </div>
+      <p class="free" data-i18n="hero_free">Müraciət etmək pulsuzdur.</p>
+
+      <div class="chips" role="group" data-i18n-aria="chips_aria" aria-label="Xidmətlər">
+        <a class="chip" href="#svc-site"><svg class="ic" aria-hidden="true"><use href="#i-site"/></svg><span data-i18n="chip_site">Veb-sayt</span></a>
+        <a class="chip" href="#svc-qr"><svg class="ic" aria-hidden="true"><use href="#i-qr"/></svg><span data-i18n="chip_qr">QR menyu</span></a>
+        <a class="chip" href="#svc-maps"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span>Google Maps</span></a>
+      </div>
+    </div>
+
+    <!-- Decorative: a map with the client's business pinned, a QR table tent and a mini website -->
+    <div class="art" aria-hidden="true">
+      <div class="map">
+        <svg viewBox="0 0 560 538" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#fff" stroke-linecap="round">
+            <path d="M-10 130H570" stroke-width="14"/>
+            <path d="M-10 276L570 258" stroke-width="18"/>
+            <path d="M-10 410L570 392" stroke-width="14"/>
+            <path d="M150 -10V570" stroke-width="14"/>
+            <path d="M330 -10V570" stroke-width="18"/>
+            <path d="M470 -10L480 570" stroke-width="12"/>
+            <path d="M60 -10V420" stroke-width="8"/>
+            <path d="M400 -10V130" stroke-width="8"/>
+            <path d="M150 340H330" stroke-width="8"/>
+          </g>
+          <g fill="#D8E1EE">
+            <rect x="170" y="148" width="58" height="44" rx="6"/>
+            <rect x="242" y="148" width="76" height="30" rx="6"/>
+            <rect x="170" y="204" width="56" height="52" rx="6"/>
+            <rect x="286" y="190" width="32" height="58" rx="6"/>
+            <rect x="352" y="148" width="100" height="40" rx="6"/>
+            <rect x="352" y="204" width="46" height="44" rx="6"/>
+            <rect x="410" y="204" width="44" height="44" rx="6"/>
+            <rect x="170" y="294" width="62" height="34" rx="6"/>
+            <rect x="246" y="294" width="64" height="34" rx="6"/>
+            <rect x="170" y="352" width="52" height="40" rx="6"/>
+            <rect x="82" y="150" width="52" height="100" rx="6"/>
+            <rect x="82" y="290" width="52" height="100" rx="6"/>
+            <rect x="494" y="150" width="60" height="90" rx="6"/>
+          </g>
+          <rect x="176" y="20" width="130" height="86" rx="14" fill="#D5EBD8"/>
+          <rect x="352" y="300" width="94" height="68" rx="12" fill="#D5EBD8"/>
+          <rect x="494" y="290" width="56" height="90" rx="12" fill="#D5EBD8"/>
+          <path d="M-10 442C70 430 112 482 122 570H-10z" fill="#BFD8F0"/>
+        </svg>
+      </div>
+      <span class="ground"></span>
+      <span class="ripple"></span>
+      <svg class="pin" viewBox="0 0 48 64"><path fill="#D43524" d="M24 0C10.7 0 0 10.4 0 23.3 0 41 24 64 24 64s24-23 24-40.7C48 10.4 37.3 0 24 0z"/><circle cx="24" cy="23" r="9" fill="#fff"/></svg>
+
+      <div class="card-float place">
+        <strong data-i18n="art_place">Sizin müəssisə</strong>
+        <span class="stars">★★★★★</span>
+        <small>Google Maps</small>
+      </div>
+      <div class="card-float tent">
+        <svg class="qr" viewBox="0 0 21 21"><use href="#qr"/></svg>
+        <span data-i18n="art_scan">Skan edin</span>
+      </div>
+      <div class="card-float minisite">
+        <div class="ms-bar"><i></i><i></i><i></i></div>
+        <b class="ms-l1"></b><b class="ms-l2"></b><b class="ms-img"></b><b class="ms-btn"></b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= SERVICES ======================= -->
+<section class="section section-white" id="services" aria-labelledby="svc-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="svc-h" data-i18n="svc_title">Xidmətlərimiz</h2>
+      <p class="sec-lead" data-i18n="svc_lead">Müştərilər biznesi əvvəlcə telefonda axtarır. Üç xidmətimiz sizi orada görünən edir.</p>
+    </div>
+
+    <div class="services">
+      <!-- 1. Website -->
+      <article class="svc" id="svc-site">
+        <div class="tile tile-site" aria-hidden="true">
+          <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid slice">
+            <rect x="34" y="30" width="236" height="152" rx="12" fill="#fff"/>
+            <path d="M34 42a12 12 0 0 1 12-12h212a12 12 0 0 1 12 12v14H34z" fill="#E9EEF5"/>
+            <circle cx="50" cy="43" r="4" fill="#D43524"/><circle cx="63" cy="43" r="4" fill="#F2A516"/><circle cx="76" cy="43" r="4" fill="#23804A"/>
+            <rect x="54" y="74" width="118" height="14" rx="4" fill="#0E1E36"/>
+            <rect x="54" y="96" width="92" height="8" rx="4" fill="#B8C4D6"/>
+            <rect x="54" y="112" width="72" height="22" rx="11" fill="#D43524"/>
+            <rect x="186" y="74" width="64" height="62" rx="8" fill="#DCEAF8"/>
+            <rect x="54" y="148" width="62" height="20" rx="6" fill="#E9EEF5"/><rect x="124" y="148" width="62" height="20" rx="6" fill="#E9EEF5"/><rect x="194" y="148" width="56" height="20" rx="6" fill="#E9EEF5"/>
+            <rect x="238" y="64" width="84" height="138" rx="15" fill="#0E1E36"/>
+            <rect x="244" y="72" width="72" height="122" rx="10" fill="#fff"/>
+            <rect x="252" y="82" width="46" height="9" rx="3" fill="#0E1E36"/>
+            <rect x="252" y="97" width="56" height="30" rx="6" fill="#DCEAF8"/>
+            <rect x="252" y="134" width="40" height="14" rx="7" fill="#D43524"/>
+            <rect x="252" y="156" width="56" height="8" rx="4" fill="#E9EEF5"/><rect x="252" y="170" width="44" height="8" rx="4" fill="#E9EEF5"/>
+          </svg>
+        </div>
+        <h3 id="s1-title" data-i18n="s1_title">Fərdi veb-sayt dizaynı</h3>
+        <p data-i18n="s1_text">Brendinizə uyğun hazırlanan, telefonda və kompüterdə səliqəli görünən sayt.</p>
+        <ul class="feat">
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s1_f1">Şablon yox, sizə özəl dizayn</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s1_f2">Mobil, planşet və kompüterə uyğun</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s1_f3">Sürətli yüklənmə və əsas SEO</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact" data-service="site" aria-describedby="s1-title" data-i18n="svc_cta">Müraciət et</a>
+      </article>
+
+      <!-- 2. QR menu -->
+      <article class="svc" id="svc-qr">
+        <div class="tile tile-qr" aria-hidden="true">
+          <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid slice">
+            <g transform="rotate(-6 120 112)">
+              <rect x="48" y="30" width="140" height="162" rx="14" fill="#fff"/>
+              <use href="#qr" transform="translate(70 50) scale(4.8)" fill="#0E1E36"/>
+              <rect x="74" y="160" width="88" height="9" rx="4.5" fill="#B8C4D6"/>
+              <rect x="90" y="175" width="56" height="7" rx="3.5" fill="#E9EEF5"/>
+            </g>
+            <rect x="214" y="38" width="96" height="156" rx="16" fill="#0E1E36"/>
+            <rect x="220" y="46" width="84" height="140" rx="11" fill="#fff"/>
+            <rect x="230" y="58" width="50" height="10" rx="3" fill="#0E1E36"/>
+            <g>
+              <rect x="230" y="80" width="26" height="26" rx="6" fill="#FBE7E3"/><rect x="262" y="84" width="34" height="7" rx="3.5" fill="#B8C4D6"/><rect x="262" y="96" width="20" height="9" rx="4.5" fill="#D43524"/>
+              <rect x="230" y="116" width="26" height="26" rx="6" fill="#DCEAF8"/><rect x="262" y="120" width="34" height="7" rx="3.5" fill="#B8C4D6"/><rect x="262" y="132" width="20" height="9" rx="4.5" fill="#D43524"/>
+              <rect x="230" y="152" width="26" height="26" rx="6" fill="#DCEFDF"/><rect x="262" y="156" width="34" height="7" rx="3.5" fill="#B8C4D6"/><rect x="262" y="168" width="20" height="9" rx="4.5" fill="#D43524"/>
+            </g>
+          </svg>
+        </div>
+        <h3 id="s2-title" data-i18n="s2_title">QR menyu yaradılması</h3>
+        <p data-i18n="s2_text">Restoran və kafelər üçün: qonaq QR kodu skan edir, menyu telefonunda açılır.</p>
+        <ul class="feat">
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s2_f1">Telefonda rahat oxunan menyu</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s2_f2">Brendinizə uyğun dizayn</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s2_f3">Masalar üçün hazır QR kod</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact" data-service="qr" aria-describedby="s2-title" data-i18n="svc_cta">Müraciət et</a>
+      </article>
+
+      <!-- 3. Google Maps -->
+      <article class="svc" id="svc-maps">
+        <div class="tile tile-map" aria-hidden="true">
+          <svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMid slice">
+            <g fill="none" stroke="#fff" stroke-linecap="round">
+              <path d="M-10 70H370" stroke-width="12"/>
+              <path d="M-10 160L370 148" stroke-width="14"/>
+              <path d="M90 -10V230" stroke-width="12"/>
+              <path d="M250 -10L256 230" stroke-width="12"/>
+              <path d="M170 70V160" stroke-width="7"/>
+            </g>
+            <rect x="106" y="86" width="50" height="56" rx="8" fill="#C5E5CB"/>
+            <path d="M-10 170C30 160 60 190 66 230H-10z" fill="#BFD8F0"/>
+            <rect x="268" y="18" width="70" height="40" rx="8" fill="#C5E5CB"/>
+            <g>
+              <ellipse cx="128" cy="150" rx="22" ry="6" fill="#0E1E36" opacity=".18"/>
+              <path fill="#D43524" d="M128 46c-14 0-25 10.6-25 24 0 18.6 25 42 25 42s25-23.4 25-42c0-13.4-11-24-25-24z"/>
+              <circle cx="128" cy="70" r="9" fill="#fff"/>
+            </g>
+            <rect x="186" y="84" width="140" height="92" rx="14" fill="#fff"/>
+            <rect x="202" y="100" width="84" height="11" rx="4" fill="#0E1E36"/>
+            <g fill="#F2A516"><circle cx="208" cy="127" r="5"/><circle cx="223" cy="127" r="5"/><circle cx="238" cy="127" r="5"/><circle cx="253" cy="127" r="5"/><circle cx="268" cy="127" r="5"/></g>
+            <rect x="202" y="144" width="66" height="22" rx="11" fill="#2563B8"/>
+          </svg>
+        </div>
+        <h3 id="s3-title" data-i18n="s3_title">Google Maps-da biznes qeydiyyatı</h3>
+        <p data-i18n="s3_text">Şirkətinizi Google Maps-a əlavə edirik ki, yaxındakı müştərilər sizi tapa bilsin.</p>
+        <ul class="feat">
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s3_f1">Ünvan, iş saatları və əlaqə məlumatları</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s3_f2">Loqo və şəkillərin əlavə olunması</span></li>
+          <li><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="s3_f3">Düzgün kateqoriya və təsvir</span></li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact" data-service="maps" aria-describedby="s3-title" data-i18n="svc_cta">Müraciət et</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PROCESS ======================= -->
+<section class="section" id="process" aria-labelledby="pr-h">
+  <div class="wrap">
+    <div class="sec-head"><h2 id="pr-h" data-i18n="pr_title">Necə işləyirik</h2></div>
+    <ol class="steps" role="list">
+      <li class="step">
+        <span class="step-n" aria-hidden="true">1</span>
+        <h3 data-i18n="pr1_t">Müraciət göndərin</h3>
+        <p data-i18n="pr1_d">Formu bir dəqiqəyə doldurun: ad, nömrə və müəssisənizin adı kifayətdir.</p>
+      </li>
+      <li class="step">
+        <span class="step-n" aria-hidden="true">2</span>
+        <h3 data-i18n="pr2_t">Biz sizinlə əlaqə saxlayırıq</h3>
+        <p data-i18n="pr2_d">Ehtiyacınızı dinləyir, uyğun həlli və qiyməti təklif edirik.</p>
+      </li>
+      <li class="step">
+        <span class="step-n" aria-hidden="true">3</span>
+        <h3 data-i18n="pr3_t">İşi təhvil veririk</h3>
+        <p data-i18n="pr3_d">Layihəni hazırlayır, sizinlə yoxlayır və istifadəyə veririk.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================= WHY ======================= -->
+<section class="section section-white" id="why" aria-labelledby="why-h">
+  <div class="wrap split">
+    <div>
+      <h2 id="why-h" data-i18n="why_title">Niyə AlphaLabs</h2>
+      <p class="sec-lead" data-i18n="why_lead">Kiçik və orta bizneslər üçün sadə, başa düşülən və nəticə verən rəqəmsal həllər.</p>
+    </div>
+    <div>
+      <div class="why-item"><h3 data-i18n="why1_t">Birbaşa ünsiyyət</h3><p data-i18n="why1_d">Layihənizi aparan şəxslə birbaşa danışırsınız, vasitəçi yoxdur.</p></div>
+      <div class="why-item"><h3 data-i18n="why2_t">Mobil-ilk yanaşma</h3><p data-i18n="why2_d">Müştərilərin çoxu telefonla axtarır, ona görə hər şeyi əvvəlcə telefon üçün qururuq.</p></div>
+      <div class="why-item"><h3 data-i18n="why3_t">Aydın razılaşma</h3><p data-i18n="why3_d">Nə hazırlanacağı, nə vaxt və nə qədərə başa gələcəyi əvvəlcədən razılaşdırılır.</p></div>
+      <div class="why-item"><h3 data-i18n="why4_t">Bir komanda, üç xidmət</h3><p data-i18n="why4_d">Sayt, QR menyu və Google Maps profili bir yerdən hazırlanır, ona görə hamısı bir-birinə uyğun olur.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FAQ ======================= -->
+<section class="section" id="faq" aria-labelledby="faq-h">
+  <div class="wrap split">
+    <h2 id="faq-h" data-i18n="faq_title">Tez-tez verilən suallar</h2>
+    <div>
+      <details>
+        <summary><span data-i18n="q1">Şəkil və ya loqonu niyə göndərməliyəm?</span><svg class="ic" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+        <p data-i18n="a1">Loqo və şəkillər saytın, menyunun və Google Maps profilinin hazırlanması üçün lazımdır. Əlinizdə yoxdursa, formanı onsuz da göndərə bilərsiniz.</p>
+      </details>
+      <details>
+        <summary><span data-i18n="q2">Qiymət necə müəyyən olunur?</span><svg class="ic" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+        <p data-i18n="a2">Qiymət xidmətin növündən və layihənin həcmindən asılıdır. Müraciətdən sonra sizə dəqiq təklif veririk.</p>
+      </details>
+      <details>
+        <summary><span data-i18n="q3">Bir neçə xidməti birlikdə sifariş etmək olarmı?</span><svg class="ic" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+        <p data-i18n="a3">Bəli. Zəng zamanı nəyə ehtiyacınız olduğunu müzakirə edir və xidmətləri birlikdə təklif edirik.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CONTACT / LEAD FORM ======================= -->
+<section class="contact dark" id="contact" aria-labelledby="ct-h">
+  <div class="wrap contact-grid">
+    <div>
+      <h2 id="ct-h" data-i18n="ct_title">Müraciətinizi göndərin</h2>
+      <p class="sec-lead" data-i18n="ct_lead">Adınızı, nömrənizi və müəssisənizin adını yazın. Qalanını telefonla razılaşdırarıq.</p>
+
+      <div class="direct" id="direct" hidden>
+        <h3 data-i18n="ct_direct">Və ya birbaşa yazın</h3>
+        <div class="direct-list">
+          <a data-contact="whatsapp" hidden><svg class="ic" aria-hidden="true"><use href="#i-chat"/></svg>WhatsApp</a>
+          <a data-contact="phone" hidden><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><span data-i18n="ct_call">Zəng et</span><span class="val"></span></a>
+          <a data-contact="email" hidden><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span data-i18n="ct_mail">E-poçt</span><span class="val"></span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <form id="lead-form" name="alphalabs-lead" method="POST" action="#" enctype="multipart/form-data" novalidate data-netlify="true" netlify-honeypot="_gotcha">
+        <h3 data-i18n="f_title">Müraciət formu</h3>
+
+        <input type="hidden" name="form-name" value="alphalabs-lead">
+        <input type="hidden" name="language" id="f-language" value="az">
+        <input type="hidden" name="service" id="f-service" value="">
+        <p class="hp" aria-hidden="true"><label>Leave empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
+
+        <div class="picked" id="picked" hidden>
+          <span><span data-i18n="f_picked">Seçilmiş xidmət:</span> <strong id="picked-name"></strong></span>
+          <button type="button" id="picked-clear" data-i18n-aria="f_picked_clear" aria-label="Xidmət seçimini ləğv et"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </div>
+
+        <div class="field">
+          <label for="f-name" data-i18n="f_name">Ad Soyad</label>
+          <input class="input" id="f-name" name="name" type="text" autocomplete="name" required minlength="3" data-i18n-ph="ph_name" placeholder="Məsələn: Aysel Məmmədova" aria-describedby="e-name">
+          <div class="err" id="e-name"></div>
+        </div>
+
+        <div class="field">
+          <label for="f-phone" data-i18n="f_phone">Əlaqə nömrəsi</label>
+          <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="+994 50 123 45 67" aria-describedby="e-phone">
+          <div class="err" id="e-phone"></div>
+        </div>
+
+        <div class="field">
+          <label for="f-business" data-i18n="f_biz">Müəssisənin adı</label>
+          <input class="input" id="f-business" name="business" type="text" autocomplete="organization" required data-i18n-ph="ph_biz" placeholder="Məsələn: Çinar Kafe" aria-describedby="e-business">
+          <div class="err" id="e-business"></div>
+        </div>
+
+        <div class="field">
+          <span class="label" id="l-image"><span data-i18n="f_img">Şəkil</span> <span class="opt" id="img-opt" data-i18n="f_opt">(könüllü)</span></span>
+          <div class="drop" id="drop">
+            <input type="file" id="f-image" name="image" accept="image/*" aria-labelledby="l-image" aria-describedby="h-image e-image">
+            <div class="drop-idle" id="drop-idle">
+              <span class="drop-ic"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg></span>
+              <span class="drop-text">
+                <strong data-i18n="f_drop">Loqonu və ya şəkli bura atın, yaxud seçin</strong>
+                <small id="h-image" data-i18n="f_drop_hint">PNG, JPG və ya WebP, 5 MB-a qədər</small>
+              </span>
+            </div>
+            <div class="drop-file" id="drop-file" hidden>
+              <img id="thumb" alt="">
+              <span class="drop-text"><strong id="file-name"></strong><small id="file-size"></small></span>
+              <button type="button" class="rm" id="file-remove" data-i18n-aria="f_remove" aria-label="Şəkli sil"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+            </div>
+          </div>
+          <div class="err" id="e-image"></div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" id="submit">
+          <span data-i18n="f_submit">Müraciəti göndər</span><span class="spin" aria-hidden="true"></span>
+        </button>
+        <div class="status" id="form-status" role="alert" hidden></div>
+        <p class="form-note" data-i18n="f_note">Müraciət etmək pulsuzdur. Məlumatlarınız yalnız sizinlə əlaqə saxlamaq üçün istifadə olunur.</p>
+        <noscript><p class="status">Formu göndərmək üçün JavaScript aktiv olmalıdır.</p></noscript>
+      </form>
+
+      <div class="success" id="success" tabindex="-1" hidden>
+        <div class="success-ic"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></div>
+        <h3 data-i18n="ok_title">Müraciətiniz qəbul olundu</h3>
+        <p id="ok-text"></p>
+        <button type="button" class="btn btn-ghost" id="again" data-i18n="ok_again">Yeni müraciət göndər</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer dark">
+  <div class="wrap foot">
+    <a class="logo" href="#top" aria-label="AlphaLabs"><span class="logo-mark"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></span>AlphaLabs</a>
+    <p data-i18n="ft_owner">Sahib: Vusal Chelebi</p>
+    <p>© <span id="year">2026</span> AlphaLabs. <span data-i18n="ft_rights">Bütün hüquqlar qorunur.</span></p>
+  </div>
+</footer>
+
+<a class="btn btn-primary sticky-cta" id="sticky" href="#contact" tabindex="-1" aria-hidden="true" data-i18n="sticky_cta">Müraciət et</a>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ========================================================================
+     CONFIG — edit these before deploying
+     ======================================================================== */
+  const CONFIG = {
+    // Where the form is POSTed (multipart/form-data, includes the uploaded image).
+    //   Formspree : 'https://formspree.io/f/xxxxxxxx'   (file uploads need a paid plan)
+    //   Netlify   : '/'                                  (Netlify Forms; works as-is when hosted on Netlify)
+    //   Custom    : '/api/lead'                          (your own serverless function)
+    FORM_ENDPOINT: '',
+
+    // Optional direct-contact buttons next to the form. Leave '' to hide a button.
+    WHATSAPP: '',   // digits only, with country code, e.g. '994501234567'
+    PHONE: '',      // e.g. '+994501234567'
+    EMAIL: '',      // e.g. 'hello@yourdomain.az'
+
+    REQUIRE_IMAGE: false,  // true = the image/logo becomes mandatory
+    MAX_IMAGE_MB: 5
+  };
+
+  /* ========================================================================
+     Translations (Azerbaijani is the default and lives in the HTML itself)
+     ======================================================================== */
+  const EN = {
+    skip: 'Skip to content',
+    nav_services: 'Services', nav_process: 'How it works', nav_faq: 'FAQ', nav_contact: 'Contact', nav_cta: 'Send a request',
+    hero_h1: 'Let customers find you',
+    hero_sub: 'Website, QR menu and Google Maps listing: three services, one team, so your business gets seen online.',
+    hero_cta1: 'Send a request', hero_cta2: 'See services', hero_free: 'Sending a request is free.',
+    chip_site: 'Website', chip_qr: 'QR menu',
+    art_place: 'Your business', art_scan: 'Scan me',
+    svc_title: 'Our services',
+    svc_lead: 'Customers look for businesses on their phones first. Our three services put you there.',
+    s1_title: 'Custom website design',
+    s1_text: 'A website made for your brand that looks sharp on phones and computers.',
+    s1_f1: 'Original design, not a template', s1_f2: 'Works on mobile, tablet and desktop', s1_f3: 'Fast loading and basic SEO',
+    s2_title: 'QR menu creation',
+    s2_text: 'For restaurants and cafes: guests scan a QR code and the menu opens on their phone.',
+    s2_f1: 'A menu that reads well on a phone', s2_f2: 'Design that matches your brand', s2_f3: 'A ready-to-print QR code for your tables',
+    s3_title: 'Google Maps business listing',
+    s3_text: 'We add your company to Google Maps so nearby customers can find you.',
+    s3_f1: 'Address, opening hours and contact details', s3_f2: 'Logo and photos added to your profile', s3_f3: 'The right category and description',
+    svc_cta: 'Send a request',
+    pr_title: 'How it works',
+    pr1_t: 'Send your request', pr1_d: 'Fill in the form in a minute: your name, number and business name are enough.',
+    pr2_t: 'We contact you', pr2_d: 'We listen to what you need and propose the right solution and price.',
+    pr3_t: 'We deliver', pr3_d: 'We build it, review it with you and hand it over, ready to use.',
+    why_title: 'Why AlphaLabs',
+    why_lead: 'Simple, clear digital solutions for small and mid-sized businesses.',
+    why1_t: 'Direct communication', why1_d: 'You talk directly to the person doing the work. No middlemen.',
+    why2_t: 'Mobile first', why2_d: 'Most customers search on a phone, so we build for the phone first.',
+    why3_t: 'Clear agreement', why3_d: 'What gets built, when, and at what price is agreed up front.',
+    why4_t: 'One team, three services', why4_d: 'Your website, QR menu and Maps profile come from one place, so they all match.',
+    faq_title: 'Common questions',
+    q1: 'Why should I upload a photo or logo?',
+    a1: 'Logos and photos are used to build your website, menu and Google Maps profile. If you don’t have them handy, you can still send the form without one.',
+    q2: 'How is the price decided?',
+    a2: 'The price depends on the service and the size of the project. After your request, we send you an exact offer.',
+    q3: 'Can I order more than one service?',
+    a3: 'Yes. On the call we discuss what you need and propose the services together.',
+    ct_title: 'Send us your request',
+    ct_lead: 'Enter your name, phone number and business name. We’ll sort out the rest by phone.',
+    ct_direct: 'Or reach us directly', ct_call: 'Call us', ct_mail: 'Email',
+    f_title: 'Request form',
+    f_picked: 'Selected service:',
+    f_name: 'Full name', f_phone: 'Phone number', f_biz: 'Business name',
+    f_img: 'Image', f_opt: '(optional)',
+    f_drop: 'Drop your logo or photo here, or browse',
+    f_drop_hint: 'PNG, JPG or WebP, up to 5 MB',
+    f_submit: 'Send request',
+    f_note: 'Sending a request is free. Your details are only used to contact you.',
+    ok_title: 'Request received', ok_again: 'Send another request',
+    ft_owner: 'Owner: Vusal Chelebi', ft_rights: 'All rights reserved.',
+    sticky_cta: 'Send a request'
+  };
+  const EN_PH = { ph_name: 'e.g. Jane Smith', ph_biz: 'e.g. Plane Tree Cafe' };
+  const EN_ARIA = {
+    nav_aria: 'Main menu', lang_aria: 'Language', chips_aria: 'Services',
+    f_remove: 'Remove image', f_picked_clear: 'Clear selected service'
+  };
+  const EN_META = {
+    title: 'AlphaLabs — Website design, QR menus and Google Maps listings',
+    desc: 'AlphaLabs digital agency: custom website design, QR menus for restaurants and cafes, and Google Maps business listings. Send your request.'
+  };
+
+  const SERVICES = {
+    site: { az: 'Fərdi veb-sayt dizaynı', en: 'Custom website design' },
+    qr:   { az: 'QR menyu yaradılması', en: 'QR menu creation' },
+    maps: { az: 'Google Maps-da biznes qeydiyyatı', en: 'Google Maps business listing' }
+  };
+
+  const MSG = {
+    az: {
+      e_name: 'Ad və soyadınızı yazın.',
+      e_phone: 'Düzgün telefon nömrəsi yazın, məsələn: +994 50 123 45 67.',
+      e_biz: 'Müəssisənin adını yazın.',
+      e_img_type: 'Yalnız şəkil faylı yükləyin (PNG, JPG və ya WebP).',
+      e_img_size: 'Şəkil {mb} MB-dan böyük ola bilməz. Daha kiçik fayl seçin.',
+      e_img_req: 'Loqonu və ya şəkli əlavə edin.',
+      s_fail: 'Müraciət göndərilmədi. İnternet bağlantısını yoxlayıb yenidən cəhd edin.',
+      s_noendpoint: 'Form hələ qoşulmayıb. Zəhmət olmasa birbaşa əlaqə saxlayın.',
+      ok_text: 'Təşəkkür edirik, {name}. Nömrəniz üzrə tezliklə sizinlə əlaqə saxlayacağıq.',
+      kb: 'KB', mb: 'MB'
+    },
+    en: {
+      e_name: 'Enter your full name.',
+      e_phone: 'Enter a valid phone number, for example +994 50 123 45 67.',
+      e_biz: 'Enter your business name.',
+      e_img_type: 'Upload an image file only (PNG, JPG or WebP).',
+      e_img_size: 'The image can’t be larger than {mb} MB. Choose a smaller file.',
+      e_img_req: 'Add your logo or a photo.',
+      s_fail: 'Your request was not sent. Check your internet connection and try again.',
+      s_noendpoint: 'The form is not connected yet. Please contact us directly.',
+      ok_text: 'Thank you, {name}. We’ll contact you on your number shortly.',
+      kb: 'KB', mb: 'MB'
+    }
+  };
+
+  /* ========================================================================
+     Helpers
+     ======================================================================== */
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  let lang = 'az';
+
+  const safeGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const safeSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } };
+
+  const msg = (key, vars) => {
+    let s = (MSG[lang] && MSG[lang][key]) || MSG.az[key] || key;
+    Object.keys(vars || {}).forEach(k => { s = s.replace('{' + k + '}', vars[k]); });
+    return s;
+  };
+
+  /* ========================================================================
+     Language switch
+     ======================================================================== */
+  const textNodes = $$('[data-i18n]');
+  const phNodes   = $$('[data-i18n-ph]');
+  const ariaNodes = $$('[data-i18n-aria]');
+  const baseText  = new Map(textNodes.map(el => [el, el.innerHTML]));
+  const basePh    = new Map(phNodes.map(el => [el, el.getAttribute('placeholder')]));
+  const baseAria  = new Map(ariaNodes.map(el => [el, el.getAttribute('aria-label')]));
+  const metaDesc  = $('meta[name="description"]');
+  const baseMeta  = { title: document.title, desc: metaDesc ? metaDesc.content : '' };
+  const langBtns  = $$('.lang button');
+
+  function setLang(next) {
+    lang = next === 'en' ? 'en' : 'az';
+    document.documentElement.lang = lang;
+
+    textNodes.forEach(el => {
+      const v = EN[el.dataset.i18n];
+      el.innerHTML = (lang === 'en' && v !== undefined) ? v : baseText.get(el);
+    });
+    phNodes.forEach(el => {
+      const v = EN_PH[el.dataset.i18nPh];
+      el.setAttribute('placeholder', (lang === 'en' && v) ? v : basePh.get(el));
+    });
+    ariaNodes.forEach(el => {
+      const v = EN_ARIA[el.dataset.i18nAria];
+      el.setAttribute('aria-label', (lang === 'en' && v) ? v : baseAria.get(el));
+    });
+    document.title = lang === 'en' ? EN_META.title : baseMeta.title;
+    if (metaDesc) metaDesc.content = lang === 'en' ? EN_META.desc : baseMeta.desc;
+
+    langBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    $('#f-language').value = lang;
+    safeSet('alphalabs-lang', lang);
+
+    renderPicked();
+    renderErrors();
+    renderStatus();
+    renderFileMeta();
+    renderSuccessText();
+  }
+
+  langBtns.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+  /* ========================================================================
+     Contact shortcuts (shown only when configured)
+     ======================================================================== */
+  (function initContacts() {
+    const links = {
+      whatsapp: CONFIG.WHATSAPP && 'https://wa.me/' + CONFIG.WHATSAPP.replace(/\D/g, ''),
+      phone: CONFIG.PHONE && 'tel:' + CONFIG.PHONE.replace(/[^\d+]/g, ''),
+      email: CONFIG.EMAIL && 'mailto:' + CONFIG.EMAIL
+    };
+    let any = false;
+    $$('[data-contact]').forEach(a => {
+      const key = a.dataset.contact;
+      if (!links[key]) return;
+      a.href = links[key];
+      if (key === 'whatsapp') { a.target = '_blank'; a.rel = 'noopener'; }
+      const val = $('.val', a);
+      if (val) val.textContent = key === 'phone' ? CONFIG.PHONE : CONFIG.EMAIL;
+      a.hidden = false;
+      any = true;
+    });
+    $('#direct').hidden = !any;
+  })();
+
+  /* ========================================================================
+     Selected service (set by the service CTA buttons)
+     ======================================================================== */
+  let service = '';
+  const picked = $('#picked');
+  function renderPicked() {
+    picked.hidden = !service;
+    if (service) $('#picked-name').textContent = SERVICES[service][lang];
+    $('#f-service').value = service ? SERVICES[service].az : '';
+  }
+  $$('[data-service]').forEach(a => a.addEventListener('click', () => { service = a.dataset.service; renderPicked(); }));
+  $('#picked-clear').addEventListener('click', () => { service = ''; renderPicked(); });
+
+  /* ========================================================================
+     Form: validation, image upload, submit
+     ======================================================================== */
+  const form = $('#lead-form');
+  const fields = { name: $('#f-name'), phone: $('#f-phone'), business: $('#f-business'), image: $('#f-image') };
+  const errs = {};           // field -> [messageKey, vars]
+  let statusKey = '';
+  let sending = false;
+  let sentName = '';
+
+  if (CONFIG.REQUIRE_IMAGE) { $('#img-opt').hidden = true; }
+
+  function checkFile(file) {
+    if (!file) return CONFIG.REQUIRE_IMAGE ? ['e_img_req'] : null;
+    if (!file.type || file.type.indexOf('image/') !== 0) return ['e_img_type'];
+    if (file.size > CONFIG.MAX_IMAGE_MB * 1024 * 1024) return ['e_img_size', { mb: CONFIG.MAX_IMAGE_MB }];
+    return null;
+  }
+  const rules = {
+    name: v => v.trim().length >= 3 ? null : ['e_name'],
+    phone: v => {
+      const digits = v.replace(/\D/g, '');
+      return /^[+\d\s().-]+$/.test(v.trim()) && digits.length >= 9 && digits.length <= 15 ? null : ['e_phone'];
+    },
+    business: v => v.trim().length >= 2 ? null : ['e_biz'],
+    image: () => checkFile(fields.image.files[0])
+  };
+
+  function setError(name, info) {
+    const el = fields[name];
+    const out = $('#e-' + name);
+    if (info) { errs[name] = info; el.setAttribute('aria-invalid', 'true'); }
+    else { delete errs[name]; el.removeAttribute('aria-invalid'); }
+    if (name === 'image') $('#drop').classList.toggle('invalid', !!info);
+    out.textContent = info ? msg(info[0], info[1]) : '';
+  }
+  function renderErrors() { Object.keys(errs).forEach(n => { $('#e-' + n).textContent = msg(errs[n][0], errs[n][1]); }); }
+  function validate(name) { const info = rules[name](name === 'image' ? '' : fields[name].value); setError(name, info); return !info; }
+
+  ['name', 'phone', 'business'].forEach(n => {
+    fields[n].addEventListener('blur', () => { if (fields[n].value || errs[n]) validate(n); });
+    fields[n].addEventListener('input', () => { if (errs[n]) validate(n); });
+  });
+
+  /* --- image picker with preview and drag & drop --- */
+  const drop = $('#drop');
+  let previewUrl = '';
+
+  function formatSize(bytes) {
+    return bytes < 1024 * 1024
+      ? Math.max(1, Math.round(bytes / 1024)) + ' ' + msg('kb')
+      : (bytes / 1024 / 1024).toFixed(1) + ' ' + msg('mb');
+  }
+  function renderFileMeta() {
+    const f = fields.image.files[0];
+    if (f) $('#file-size').textContent = formatSize(f.size);
+  }
+  function clearFile() {
+    fields.image.value = '';
+    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = ''; }
+    $('#drop-file').hidden = true;
+    $('#drop-idle').hidden = false;
+    $('#thumb').removeAttribute('src');
+  }
+  function handleFile(file) {
+    const problem = checkFile(file);
+    if (problem && file) { clearFile(); setError('image', problem); return; }
+    setError('image', null);
+    if (!file) { clearFile(); return; }
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = URL.createObjectURL(file);
+    $('#thumb').src = previewUrl;
+    $('#file-name').textContent = file.name;
+    renderFileMeta();
+    $('#drop-idle').hidden = true;
+    $('#drop-file').hidden = false;
+  }
+
+  fields.image.addEventListener('change', () => handleFile(fields.image.files[0]));
+  $('#file-remove').addEventListener('click', () => { clearFile(); setError('image', CONFIG.REQUIRE_IMAGE ? ['e_img_req'] : null); });
+
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'dragend'].forEach(t => drop.addEventListener(t, () => drop.classList.remove('over')));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('over');
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!file) return;
+    try {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      fields.image.files = dt.files;
+    } catch (err) { /* very old browsers: fall back to the picker */ return; }
+    handleFile(file);
+  });
+  // stop the browser from opening a file that is dropped outside the drop zone
+  ['dragover', 'drop'].forEach(t => window.addEventListener(t, e => { if (!drop.contains(e.target)) e.preventDefault(); }));
+
+  /* --- status + success --- */
+  const statusEl = $('#form-status');
+  function showStatus(key) { statusKey = key; renderStatus(); }
+  function renderStatus() {
+    statusEl.hidden = !statusKey;
+    statusEl.textContent = statusKey ? msg(statusKey) : '';
+  }
+  function renderSuccessText() {
+    if (sentName) $('#ok-text').textContent = msg('ok_text', { name: sentName });
+  }
+  function setSending(on) {
+    sending = on;
+    const btn = $('#submit');
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+    form.setAttribute('aria-busy', String(on));
+  }
+  function showSuccess(name) {
+    sentName = (name || '').trim().split(/\s+/)[0] || '';
+    renderSuccessText();
+    form.hidden = true;
+    const box = $('#success');
+    box.hidden = false;
+    box.focus({ preventScroll: true });
+    box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  $('#again').addEventListener('click', () => {
+    form.reset();
+    clearFile();
+    Object.keys(errs).forEach(n => setError(n, null));
+    service = ''; renderPicked();
+    sentName = '';
+    $('#success').hidden = true;
+    form.hidden = false;
+    fields.name.focus();
+  });
+
+  /* --- submit --- */
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (sending) return;
+    showStatus('');
+
+    const order = ['name', 'phone', 'business', 'image'];
+    const bad = order.filter(n => !validate(n));
+    if (bad.length) { fields[bad[0]].focus(); return; }
+
+    const data = new FormData(form);
+    if (data.get('_gotcha')) { showSuccess(fields.name.value); return; }   // bot caught by honeypot
+
+    if (!CONFIG.FORM_ENDPOINT) {
+      console.error('AlphaLabs: set CONFIG.FORM_ENDPOINT in index.html to receive submissions.');
+      showStatus('s_noendpoint');
+      return;
+    }
+
+    if (!fields.image.files[0]) data.delete('image');
+    data.set('service', service ? SERVICES[service].az : '');
+    data.set('language', lang);
+    data.set('_subject', 'AlphaLabs: yeni müraciət — ' + fields.business.value.trim());
+
+    setSending(true);
+    try {
+      const res = await fetch(CONFIG.FORM_ENDPOINT, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      showSuccess(fields.name.value);
+    } catch (err) {
+      console.error('AlphaLabs form error:', err);
+      showStatus('s_fail');
+    } finally {
+      setSending(false);
+    }
+  });
+
+  /* ========================================================================
+     Page behaviour: header border, sticky mobile CTA, year
+     ======================================================================== */
+  const header = $('#header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const sticky = $('#sticky');
+  if ('IntersectionObserver' in window) {
+    const seen = { hero: true, contact: false };
+    const update = () => {
+      const show = !seen.hero && !seen.contact;
+      sticky.classList.toggle('show', show);
+      sticky.setAttribute('aria-hidden', String(!show));
+      sticky.tabIndex = show ? 0 : -1;
+    };
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { seen[en.target.id] = en.isIntersecting; });
+      update();
+    });
+    io.observe($('#hero'));
+    io.observe($('#contact'));
+  }
+
+  $('#year').textContent = new Date().getFullYear();
+
+  /* ========================================================================
+     Init language (saved choice, ?lang=en, otherwise Azerbaijani)
+     ======================================================================== */
+  const fromUrl = new URLSearchParams(location.search).get('lang');
+  const initial = fromUrl === 'en' || fromUrl === 'az' ? fromUrl : safeGet('alphalabs-lang');
+  setLang(initial === 'en' ? 'en' : 'az');
+})();
+</script>
+</body>
+</html>
