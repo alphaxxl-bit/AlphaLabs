@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>AlphaLabs — Admin panel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23D43524' d='M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z'/%3E%3Ccircle cx='12' cy='9' r='2.6' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Manrope:wght@400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F5F9;--white:#fff;--ink:#0E1E36;--muted:#56657C;--line:#D9E1EC;
+  --pin:#D43524;--pin-hover:#B92B1B;--sea:#2563B8;--ok:#23804A;--warn:#B7791F;
+  --f-display:"Bricolage Grotesque","Manrope",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r-s:10px;--r-m:18px;--pill:999px;
+}
+*,*::before,*::after{box-sizing:border-box}*{margin:0}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{font:400 1rem/1.55 var(--f-body);color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+h1,h2{font-family:var(--f-display);font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.wrap{max-width:1160px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border:2px solid transparent;border-radius:var(--pill);font:700 .95rem/1 var(--f-body);cursor:pointer;text-decoration:none;transition:background-color .15s,color .15s}
+.btn-primary{background:var(--pin);color:#fff}.btn-primary:hover{background:var(--pin-hover)}
+.btn-ghost{border-color:var(--ink);background:transparent}.btn-ghost:hover{background:var(--ink);color:#fff}
+.btn-sm{min-height:38px;padding:0 16px;font-size:.88rem}
+.btn:disabled{opacity:.6;cursor:wait}
+
+/* login */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gate-box{width:100%;max-width:400px;background:var(--white);border:1px solid var(--line);border-radius:var(--r-m);padding:32px;box-shadow:0 30px 50px -35px rgba(14,30,54,.45)}
+.logo{display:inline-flex;align-items:center;gap:10px;font:700 1.25rem/1 var(--f-display)}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:var(--ink);display:grid;place-items:center}
+.logo-mark svg{width:18px;height:18px;color:var(--pin)}
+.gate h1{font-size:1.7rem;margin:22px 0 6px}
+.gate p{color:var(--muted);font-size:.95rem}
+.field{display:grid;gap:6px;margin-top:18px}
+.field label{font-weight:700;font-size:.92rem}
+.input{width:100%;min-height:48px;padding:0 14px;background:var(--white);border:1.5px solid var(--line);border-radius:var(--r-s)}
+.input:focus{border-color:var(--sea);outline:none;box-shadow:0 0 0 3px rgba(37,99,184,.2)}
+.err{color:var(--pin);font-size:.9rem;font-weight:600;min-height:1.4em;margin-top:8px}
+.gate .btn{width:100%;margin-top:10px;min-height:52px}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:rgba(242,245,249,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top-in{height:64px;display:flex;align-items:center;gap:14px}
+.top-in .sp{margin-left:auto}
+.tag{font-size:.8rem;font-weight:700;color:var(--muted);background:var(--white);border:1px solid var(--line);border-radius:var(--pill);padding:4px 12px}
+
+/* stats */
+.stats{display:flex;flex-wrap:wrap;gap:12px 36px;padding:28px 0 8px}
+.stat b{display:block;font:700 2.2rem/1 var(--f-display);letter-spacing:-.03em}
+.stat span{font-size:.9rem;color:var(--muted);font-weight:600}
+.stat.new b{color:var(--pin)}.stat.won b{color:var(--ok)}
+
+/* toolbar */
+.bar{display:flex;flex-wrap:wrap;gap:10px;padding:18px 0}
+.bar .input{min-height:44px;width:auto;flex:1 1 220px}
+.bar select.input{flex:0 1 190px}
+.bar .gap{flex:1 1 0}
+
+/* list */
+.list{background:var(--white);border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;margin-bottom:48px}
+.row{display:grid;grid-template-columns:96px minmax(0,1.3fr) minmax(0,1.1fr) 170px minmax(0,1.2fr) 44px;gap:14px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);border-left:4px solid var(--st,var(--line))}
+.row:first-child{border-top:0}
+.row.head{font-size:.85rem;font-weight:700;color:var(--muted);background:var(--paper);padding-block:10px;border-left-color:transparent}
+.row[data-s=new]{--st:var(--pin)}.row[data-s=contacted]{--st:var(--sea)}.row[data-s=won]{--st:var(--ok)}.row[data-s=lost]{--st:#9AA6B8}
+.who strong{display:block;font-weight:700}
+.sub{display:block;font-size:.86rem;color:var(--muted)}
+.contact a{color:var(--sea);font-weight:700;text-decoration:none}.contact a:hover{text-decoration:underline}
+.contact .wa{margin-left:10px;color:var(--ok)}
+.row .input{min-height:38px;font-size:.9rem;padding:0 10px}
+.del{width:40px;height:40px;border:0;border-radius:var(--r-s);background:transparent;color:var(--muted);cursor:pointer;font-size:1.3rem;line-height:1}
+.del:hover{background:#FBE7E3;color:var(--pin)}
+.empty{padding:56px 24px;text-align:center;color:var(--muted)}
+.empty h2{font-size:1.4rem;color:var(--ink);margin-bottom:8px}
+.empty p{max-width:46ch;margin:0 auto 18px}
+
+@media(max-width:860px){
+  .row.head{display:none}
+  .row{grid-template-columns:1fr 1fr;gap:8px 12px}
+  .row>.d{grid-column:1/-1;font-size:.82rem;color:var(--muted)}
+  .row>.who,.row>.contact{grid-column:1/-1}
+  .row>.note{grid-column:1/2}.row>.del{justify-self:end}
+}
+
+/* dialog */
+dialog{border:0;border-radius:var(--r-m);padding:28px;width:min(440px,calc(100% - 32px));box-shadow:0 40px 80px -30px rgba(14,30,54,.6)}
+dialog::backdrop{background:rgba(14,30,54,.45)}
+dialog h2{font-size:1.5rem}
+.actions{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--pill);font-weight:600;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Giriş -->
+<main class="gate" id="gate">
+  <form class="gate-box" id="gate-form" autocomplete="off">
+    <span class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></span>AlphaLabs</span>
+    <h1 id="g-title">Admin panel</h1>
+    <p id="g-hint"></p>
+    <div class="field"><label for="pw">Parol</label><input class="input" id="pw" type="password" autocomplete="current-password" required minlength="6"></div>
+    <div class="field" id="pw2-wrap" hidden><label for="pw2">Parolu təkrarlayın</label><input class="input" id="pw2" type="password" autocomplete="new-password"></div>
+    <p class="err" id="g-err" role="alert"></p>
+    <button class="btn btn-primary" id="g-btn" type="submit">Daxil ol</button>
+  </form>
+</main>
+
+<!-- Panel -->
+<div id="app" hidden>
+  <header class="top"><div class="wrap top-in">
+    <span class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.6" fill="#fff"/></svg></span>AlphaLabs</span>
+    <span class="tag" id="mode"></span>
+    <button class="btn btn-ghost btn-sm sp" id="logout" type="button">Çıxış</button>
+  </div></header>
+
+  <div class="wrap">
+    <section class="stats" aria-label="Statistika" id="stats"></section>
+
+    <div class="bar">
+      <input class="input" id="q" type="search" placeholder="Ad, nömrə və ya müəssisə üzrə axtar" aria-label="Axtarış">
+      <select class="input" id="f" aria-label="Status filtri"></select>
+      <button class="btn btn-primary btn-sm" id="add" type="button">Müraciət əlavə et</button>
+      <button class="btn btn-ghost btn-sm" id="imp" type="button">İdxal (CSV/JSON)</button>
+      <button class="btn btn-ghost btn-sm" id="exp" type="button">CSV yüklə</button>
+      <input type="file" id="file" accept=".csv,.json,text/csv,application/json" hidden>
+    </div>
+
+    <div class="list" id="list" aria-live="polite"></div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="add-form">
+    <h2>Yeni müraciət</h2>
+    <div class="field"><label for="a-name">Ad Soyad</label><input class="input" id="a-name" required></div>
+    <div class="field"><label for="a-phone">Əlaqə nömrəsi</label><input class="input" id="a-phone" type="tel" required></div>
+    <div class="field"><label for="a-biz">Müəssisənin adı</label><input class="input" id="a-biz" required></div>
+    <div class="field"><label for="a-svc">Xidmət</label>
+      <select class="input" id="a-svc"><option value="">Seçilməyib</option><option>Fərdi veb-sayt</option><option>QR menyu</option><option>Google Maps qeydiyyatı</option></select></div>
+    <div class="actions"><button class="btn btn-ghost btn-sm" type="button" id="a-cancel">Ləğv et</button><button class="btn btn-primary btn-sm" type="submit">Əlavə et</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ==========================================================================
+   CONFIG
+   API_URL boşdursa: müraciətlər yalnız bu brauzerdə (localStorage) saxlanılır
+   və formadan gələn məlumatları CSV/JSON idxalı ilə əlavə edirsiniz.
+   API_URL verilərsə: GET → [ {...lead} ] qaytarmalı, PUT → bütün siyahını əvəz etməlidir.
+   Parol Authorization: Bearer <parol> başlığı ilə göndərilir.
+   ========================================================================== */
+const CONFIG = { API_URL: '' };
+
+const STATUS = { new: 'Yeni', contacted: 'Əlaqə saxlanıldı', won: 'Razılaşdı', lost: 'İmtina' };
+const LS_LEADS = 'alphalabs-admin-leads', LS_HASH = 'alphalabs-admin-hash', SS_AUTH = 'alphalabs-admin-auth';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const API = !!CONFIG.API_URL;
+
+let leads = [], token = '';
+
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 2400); }
+async function sha(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+
+/* ---------- storage ---------- */
+async function load() {
+  if (API) {
+    const r = await fetch(CONFIG.API_URL, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' } });
+    if (r.status === 401 || r.status === 403) throw new Error('auth');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json(); return Array.isArray(d) ? d : (d.leads || []);
+  }
+  try { return JSON.parse(localStorage.getItem(LS_LEADS)) || []; } catch (e) { return []; }
+}
+async function save() {
+  if (API) {
+    try {
+      const r = await fetch(CONFIG.API_URL, { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(leads) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+    } catch (e) { toast('Yadda saxlanmadı: server xətası'); console.error(e); }
+    return;
+  }
+  try { localStorage.setItem(LS_LEADS, JSON.stringify(leads)); } catch (e) { toast('Yadda saxlanmadı: brauzer yaddaşı dolub'); }
+}
+
+/* ---------- login ---------- */
+const gateForm = $('#gate-form');
+let hasPin = API || !!localStorage.getItem(LS_HASH);
+function setupGate() {
+  $('#pw2-wrap').hidden = hasPin;
+  $('#pw2').required = !hasPin;
+  $('#g-btn').textContent = hasPin ? 'Daxil ol' : 'Parol təyin et';
+  $('#g-hint').textContent = hasPin ? 'Davam etmək üçün parolu daxil edin.' : 'İlk giriş: bu cihaz üçün parol təyin edin (ən azı 6 simvol).';
+}
+gateForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const pw = $('#pw').value, err = $('#g-err'), btn = $('#g-btn');
+  err.textContent = '';
+  try {
+    if (API) {
+      token = pw; btn.disabled = true;
+      leads = await load();
+    } else if (!hasPin) {
+      if (pw.length < 6) { err.textContent = 'Parol ən azı 6 simvol olmalıdır.'; return; }
+      if (pw !== $('#pw2').value) { err.textContent = 'Parollar eyni deyil.'; return; }
+      localStorage.setItem(LS_HASH, await sha(pw));
+      leads = await load();
+    } else {
+      if (await sha(pw) !== localStorage.getItem(LS_HASH)) { err.textContent = 'Parol səhvdir.'; return; }
+      leads = await load();
+    }
+    sessionStorage.setItem(SS_AUTH, API ? pw : '1');
+    openApp();
+  } catch (x) {
+    err.textContent = x.message === 'auth' ? 'Parol səhvdir.' : 'Serverə qoşulmaq alınmadı. API_URL-i yoxlayın.';
+  } finally { btn.disabled = false; }
+});
+$('#logout').addEventListener('click', () => { sessionStorage.removeItem(SS_AUTH); location.reload(); });
+
+function openApp() {
+  $('#gate').hidden = true; $('#app').hidden = false;
+  $('#mode').textContent = API ? 'Server' : 'Yalnız bu brauzer';
+  render();
+}
+
+/* ---------- render ---------- */
+function render() {
+  const n = s => leads.filter(l => l.status === s).length;
+  $('#stats').innerHTML =
+    `<div class="stat"><b>${leads.length}</b><span>Ümumi müraciət</span></div>` +
+    `<div class="stat new"><b>${n('new')}</b><span>Yeni</span></div>` +
+    `<div class="stat"><b>${n('contacted')}</b><span>Əlaqə saxlanılıb</span></div>` +
+    `<div class="stat won"><b>${n('won')}</b><span>Razılaşdı</span></div>`;
+
+  const q = $('#q').value.trim().toLowerCase(), f = $('#f').value;
+  const rows = leads.filter(l => (!f || l.status === f) &&
+    (!q || [l.name, l.phone, l.business, l.service].join(' ').toLowerCase().includes(q)))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  const list = $('#list');
+  if (!rows.length) {
+    list.innerHTML = leads.length
+      ? `<div class="empty"><h2>Heç nə tapılmadı</h2><p>Axtarışı və ya status filtrini dəyişin.</p></div>`
+      : `<div class="empty"><h2>Hələ müraciət yoxdur</h2><p>Formadan gələn müraciətləri CSV və ya JSON kimi idxal edin, ya da telefonla gələn müştərini əl ilə əlavə edin.</p><button class="btn btn-primary btn-sm" id="empty-add" type="button">Müraciət əlavə et</button></div>`;
+    const b = $('#empty-add'); if (b) b.onclick = () => $('#dlg').showModal();
+    return;
+  }
+  list.innerHTML = `<div class="row head" aria-hidden="true"><span>Tarix</span><span>Müştəri</span><span>Əlaqə</span><span>Status</span><span>Qeyd</span><span></span></div>` +
+    rows.map(l => {
+      const wa = waLink(l.phone), tel = String(l.phone || '').replace(/[^\d+]/g, '');
+      return `<div class="row" data-s="${esc(l.status)}" data-id="${esc(l.id)}">
+        <span class="d">${fmtDate(l.date)}</span>
+        <div class="who"><strong>${esc(l.name) || '—'}</strong><span class="sub">${esc(l.business)}${l.service ? ' · ' + esc(l.service) : ''}</span></div>
+        <div class="contact">${l.phone ? `<a href="tel:${esc(tel)}">${esc(l.phone)}</a>` : ''}${wa ? `<a class="wa" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}</div>
+        <select class="input st" aria-label="Status: ${esc(l.name)}">${Object.keys(STATUS).map(k => `<option value="${k}"${k === l.status ? ' selected' : ''}>${STATUS[k]}</option>`).join('')}</select>
+        <input class="input note" value="${esc(l.note)}" placeholder="Qeyd əlavə et" aria-label="Qeyd: ${esc(l.name)}">
+        <button class="del" type="button" aria-label="Sil: ${esc(l.name)}">×</button>
+      </div>`;
+    }).join('');
+}
+function fmtDate(d) { const t = new Date(d); return isNaN(t) ? '—' : t.toLocaleDateString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+function waLink(p) {
+  let d = String(p || '').replace(/\D/g, ''); if (!d) return '';
+  if (d.startsWith('0')) d = '994' + d.slice(1); else if (d.length === 9) d = '994' + d;
+  return 'https://wa.me/' + d;
+}
+
+/* ---------- interactions ---------- */
+const sel = $('#f');
+sel.innerHTML = '<option value="">Bütün statuslar</option>' + Object.keys(STATUS).map(k => `<option value="${k}">${STATUS[k]}</option>`).join('');
+$('#q').addEventListener('input', render);
+sel.addEventListener('change', render);
+
+const list = $('#list');
+list.addEventListener('change', e => {
+  const row = e.target.closest('.row'); if (!row) return;
+  const l = leads.find(x => x.id === row.dataset.id); if (!l) return;
+  if (e.target.classList.contains('st')) { l.status = e.target.value; save(); render(); toast('Status yeniləndi'); }
+  else if (e.target.classList.contains('note')) { l.note = e.target.value; save(); toast('Qeyd saxlanıldı'); }
+});
+list.addEventListener('click', e => {
+  if (!e.target.classList.contains('del')) return;
+  const row = e.target.closest('.row'), l = leads.find(x => x.id === row.dataset.id);
+  if (l && confirm(`"${l.name || l.business}" müraciəti silinsin? Bu əməliyyatı geri qaytarmaq olmur.`)) {
+    leads = leads.filter(x => x.id !== l.id); save(); render(); toast('Müraciət silindi');
+  }
+});
+
+const dlg = $('#dlg');
+$('#add').addEventListener('click', () => { $('#add-form').reset(); dlg.showModal(); });
+$('#a-cancel').addEventListener('click', () => dlg.close());
+$('#add-form').addEventListener('submit', () => {
+  leads.push({ id: uid(), date: new Date().toISOString(), name: $('#a-name').value.trim(), phone: $('#a-phone').value.trim(), business: $('#a-biz').value.trim(), service: $('#a-svc').value, status: 'new', note: '' });
+  save(); render(); toast('Müraciət əlavə olundu');
+});
+
+/* ---------- import / export ---------- */
+function parseCSV(text) {
+  const rows = []; let row = [], cur = '', q = false;
+  text = text.replace(/^\uFEFF/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ',' || c === ';') { row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cur); cur = ''; if (row.some(x => x.trim())) rows.push(row); row = []; }
+    else cur += c;
+  }
+  row.push(cur); if (row.some(x => x.trim())) rows.push(row);
+  return rows;
+}
+function mapKey(h) {
+  h = h.toLowerCase().trim();
+  if (/business|müəssisə|company/.test(h)) return 'business';
+  if (/phone|telefon|nömr|əlaqə/.test(h)) return 'phone';
+  if (/service|xidmət/.test(h)) return 'service';
+  if (/date|created|submitted|tarix|time/.test(h)) return 'date';
+  if (/status/.test(h)) return 'status';
+  if (/note|qeyd/.test(h)) return 'note';
+  if (/name|^ad\b/.test(h)) return 'name';
+  return '';
+}
+function normalize(o) {
+  const t = new Date(o.date);
+  return { id: o.id || uid(), date: isNaN(t) ? new Date().toISOString() : t.toISOString(), name: String(o.name || '').trim(), phone: String(o.phone || '').trim(), business: String(o.business || '').trim(), service: String(o.service || '').trim(), status: STATUS[o.status] ? o.status : 'new', note: String(o.note || '') };
+}
+$('#imp').addEventListener('click', () => $('#file').click());
+$('#file').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const text = await f.text(); let items = [];
+    if (/\.json$/i.test(f.name)) {
+      const d = JSON.parse(text); items = (Array.isArray(d) ? d : (d.leads || d.submissions || [])).map(o => { const r = {}; Object.keys(o).forEach(k => { const m = mapKey(k); if (m) r[m] = o[k]; }); return r; });
+    } else {
+      const rows = parseCSV(text), keys = (rows.shift() || []).map(mapKey);
+      items = rows.map(r => { const o = {}; keys.forEach((k, i) => { if (k && !o[k]) o[k] = r[i]; }); return o; });
+    }
+    const seen = new Set(leads.map(l => [l.phone, l.business, l.date].join('|')));
+    let added = 0;
+    items.map(normalize).filter(l => l.name || l.phone || l.business).forEach(l => {
+      const key = [l.phone, l.business, l.date].join('|');
+      if (!seen.has(key)) { seen.add(key); leads.push(l); added++; }
+    });
+    await save(); render();
+    toast(added ? added + ' müraciət idxal olundu' : 'Yeni müraciət tapılmadı');
+  } catch (x) { console.error(x); toast('Fayl oxunmadı. CSV və ya JSON formatını yoxlayın.'); }
+});
+$('#exp').addEventListener('click', () => {
+  if (!leads.length) { toast('İxrac üçün müraciət yoxdur'); return; }
+  const cell = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const head = ['date', 'name', 'phone', 'business', 'service', 'status', 'note'];
+  const csv = '\uFEFF' + [head.join(',')].concat(leads.map(l => head.map(h => cell(l[h])).join(','))).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'alphalabs-muracietler-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+/* ---------- init ---------- */
+setupGate();
+const auth = sessionStorage.getItem(SS_AUTH);
+if (auth) {
+  if (API) token = auth;
+  load().then(d => { leads = d; openApp(); }).catch(() => sessionStorage.removeItem(SS_AUTH));
+}
+})();
+</script>
+</body>
+</html>
