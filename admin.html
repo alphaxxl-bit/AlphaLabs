@@ -181,9 +181,11 @@ async function sha(s) { const b = await crypto.subtle.digest('SHA-256', new Text
 /* ---------- storage ---------- */
 async function load() {
   if (API) {
+    if (location.protocol === 'file:') throw new Error('file');
     const r = await fetch(CONFIG.API_URL, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' } });
     if (r.status === 401 || r.status === 403) throw new Error('auth');
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+    if (r.status === 404) throw new Error('404');
+    if (!r.ok) { let m = ''; try { m = (await r.json()).error; } catch (e) {} throw new Error(m || 'HTTP ' + r.status); }
     const d = await r.json(); return Array.isArray(d) ? d : (d.leads || []);
   }
   try { return JSON.parse(localStorage.getItem(LS_LEADS)) || []; } catch (e) { return []; }
@@ -206,7 +208,7 @@ function setupGate() {
   $('#pw2-wrap').hidden = hasPin;
   $('#pw2').required = !hasPin;
   $('#g-btn').textContent = hasPin ? 'Daxil ol' : 'Parol təyin et';
-  $('#g-hint').textContent = hasPin ? 'Davam etmək üçün parolu daxil edin.' : 'İlk giriş: bu cihaz üçün parol təyin edin (ən azı 6 simvol).';
+  $('#g-hint').textContent = API ? 'Server rejimi. Vercel-də təyin etdiyiniz ADMIN_PASSWORD parolunu daxil edin.' : hasPin ? 'Yerli rejim (yalnız bu brauzer). Parolu daxil edin.' : 'Yerli rejim (yalnız bu brauzer). Parol təyin edin, ən azı 6 simvol.';
 }
 gateForm.addEventListener('submit', async e => {
   e.preventDefault();
@@ -228,7 +230,8 @@ gateForm.addEventListener('submit', async e => {
     sessionStorage.setItem(SS_AUTH, API ? pw : '1');
     openApp();
   } catch (x) {
-    err.textContent = x.message === 'auth' ? 'Parol səhvdir.' : 'Serverə qoşulmaq alınmadı. API_URL-i yoxlayın.';
+    const M = { auth: 'Parol səhvdir.', file: 'Fayl birbaşa açılıb. Panel yalnız deploy olunmuş https:// ünvanından işləyir.', 404: '/api/lead tapılmadı: api qovluğu deploy olunmayıb.', 'no-admin-password': 'Vercel-də ADMIN_PASSWORD təyin edilməyib.', 'no-redis': 'Vercel-də Upstash Redis qoşulmayıb.' };
+    err.textContent = M[x.message] || ('Server xətası: ' + x.message);
   } finally { btn.disabled = false; }
 });
 $('#logout').addEventListener('click', () => { sessionStorage.removeItem(SS_AUTH); location.reload(); });
@@ -267,7 +270,7 @@ function render() {
       return `<div class="row" data-s="${esc(l.status)}" data-id="${esc(l.id)}">
         <span class="d">${fmtDate(l.date)}</span>
         <div class="who"><strong>${esc(l.name) || '—'}</strong><span class="sub">${esc(l.business)}${l.service ? ' · ' + esc(l.service) : ''}</span></div>
-        <div class="contact">${l.phone ? `<a href="tel:${esc(tel)}">${esc(l.phone)}</a>` : ''}${wa ? `<a class="wa" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}</div>
+        <div class="contact">${l.phone ? `<a href="tel:${esc(tel)}">${esc(l.phone)}</a>` : ''}${wa ? `<a class="wa" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}${/^https:\/\//.test(l.image || '') ? `<a class="wa" href="${esc(l.image)}" target="_blank" rel="noopener">Logo</a>` : ''}</div>
         <select class="input st" aria-label="Status: ${esc(l.name)}">${Object.keys(STATUS).map(k => `<option value="${k}"${k === l.status ? ' selected' : ''}>${STATUS[k]}</option>`).join('')}</select>
         <input class="input note" value="${esc(l.note)}" placeholder="Qeyd əlavə et" aria-label="Qeyd: ${esc(l.name)}">
         <button class="del" type="button" aria-label="Sil: ${esc(l.name)}">×</button>
